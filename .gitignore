@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Generated network data
+data/*
+!data/.gitkeep
