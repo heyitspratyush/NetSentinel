@@ -1,8 +1,20 @@
 from scapy.all import sniff
 from src.parser.parser import parse_packet
+from src.analyzer.flow_tracker import FlowTracker
 
 def capture_packets(interface,count):
     return sniff(iface=interface,count= count)
+
+def process_packets(packets):
+    tracker = FlowTracker()
+
+    for packet in packets:
+        packet_info = parse_packet(packet)
+
+        if packet_info is not None:
+            tracker.process_packet(packet_info)
+
+    return tracker
 
 
 def print_packet_info(packets):
@@ -15,4 +27,11 @@ def print_packet_info(packets):
 if __name__ == "__main__":
     interface = "Intel(R) Wi-Fi 6E AX211 160MHz"
     packets=capture_packets(interface,10)
-    print_packet_info(packets)
+    tracker = process_packets(packets)
+
+    for flow in tracker.get_flows():
+        print(flow)
+        print("Duration:", flow.duration())
+        print("Packets/sec:", flow.packets_rate())
+        print("Bytes/sec:", flow.bytes_rate())
+        print()
