@@ -21,6 +21,21 @@ class Flow:
             self.start_time  = packet.timestamp
         if (self.end_time == None or  self.end_time < packet.timestamp):
             self.end_time  = packet.timestamp
+    def duration(self):
+        if self.start_time is None or self.end_time is None:
+            return 0.0
+        return self.end_time-self.start_time
+    def packets_rate (self):
+        duration = self.duration()
+        if duration <=0:
+            return 0.0
+
+        return self.packet_count/duration
+    def bytes_rate(self):
+        duration = self.duration()
+        if duration<=0:
+            return 0.0
+        return self.total_bytes/duration
 
 def get_flow_key(packet: PacketInfo):
     endpoint_a = (packet.src_ip, packet.src_port)
