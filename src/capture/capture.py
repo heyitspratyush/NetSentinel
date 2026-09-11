@@ -1,6 +1,7 @@
 from scapy.all import sniff
 from src.parser.parser import parse_packet
 from src.analyzer.flow_tracker import FlowTracker
+from src.database.database import process_and_save_packet
 
 def capture_packets(interface,count):
     return sniff(iface=interface,count= count)
@@ -12,7 +13,7 @@ def process_packets(packets):
         packet_info = parse_packet(packet)
 
         if packet_info is not None:
-            tracker.process_packet(packet_info)
+            process_and_save_packet(tracker, packet_info)
 
     return tracker
 
