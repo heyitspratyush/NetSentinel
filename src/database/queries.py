@@ -55,4 +55,71 @@ def get_limited_largest_flows_by_byte_count():
         return cursor.fetchall()
     finally:
         connection.close()
+
+def get_protocol_distribution():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT protocol,COUNT(*) as count FROM packets p JOIN flows f ON p.flow_id = f.flow_id GROUP BY protocol ORDER BY count DESC""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+
+def get_top_src_ips():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT src_ip,SUM(packet_count)  FROM flows GROUP BY src_ip ORDER BY SUM(packet_count) DESC""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+def get_top_dst_ips():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT dst_ip,SUM(packet_count) FROM flows GROUP BY dst_ip ORDER BY SUM(packet_count) DESC""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+def get_top_src_port():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT src_port,SUM(packet_count) FROM flows GROUP BY src_port ORDER BY SUM(packet_count) DESC""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+def get_top_dst_port():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT dst_port,SUM(packet_count) FROM flows GROUP BY dst_port ORDER BY SUM(packet_count) DESC""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+def get_bandwidth():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT CAST(timestamp as INTEGER) as time_buckets,SUM(size) as total_bytes FROM packets GROUP BY CAST(timestamp as INTEGER) ORDER BY CAST(timestamp as INTEGER)""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+
+def get_traffic():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT CAST(timestamp as INTEGER) as time_buckets,COUNT(*) as total_packets,SUM(size) as total_bytes FROM packets GROUP BY CAST(timestamp as INTEGER) ORDER BY CAST(timestamp as INTEGER)""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
+def get_most_active_flows():
+    connection = connect_db(db_path)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""SELECT flow_id as flows,packet_count as total_packets,byte_count as total_bytes FROM flows  ORDER BY packet_count DESC LIMIT 3""")
+        return cursor.fetchall()
+    finally:
+        connection.close()
     
