@@ -59,12 +59,12 @@ def initialize_db(db_path:Path):
     finally:
         connection.close()
 
-def  create_flow_id(key):
+def  create_flow_id(key,session_id):
     endpoint_a, endpoint_b, protocol = key
     ip_a, port_a = endpoint_a
     ip_b, port_b = endpoint_b
 
-    return f"{ip_a}:{port_a}-{ip_b}:{port_b}-{protocol}"
+    return f"{session_id}-{ip_a}:{port_a}-{ip_b}:{port_b}-{protocol}"
 
 
 def save_flow(flow_id, flow):
@@ -162,14 +162,14 @@ def update_flow(flow_id, flow):
 
     finally:
         connection.close()
-def process_and_save_packet(tracker, packet):
+def process_and_save_packet(tracker, packet,session_id):
 
     key = get_flow_key(packet)
 
     new_flow = key not in tracker.flows
     tracker.process_packet(packet)
     flow = tracker.flows[key]
-    flow_id = create_flow_id(key)
+    flow_id = create_flow_id(key,session_id)
 
     if new_flow:
         save_flow(flow_id, flow)
