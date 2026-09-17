@@ -1,2 +1,7 @@
-﻿scapy==2.7.0
+iniconfig==2.3.0
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
 pytest==9.1.1
+python-dotenv==1.2.3
+scapy==2.7.0

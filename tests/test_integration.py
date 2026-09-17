@@ -1,6 +1,7 @@
-from scapy.all import IP, TCP, UDP
+from scapy.all import IP, TCP
 
 from src.capture.capture import process_packets
+from src.analyzer.flow_tracker import FlowTracker
 
 
 def test_packet_parsing_and_flow_tracking():
@@ -25,7 +26,14 @@ def test_packet_parsing_and_flow_tracking():
     p1.time = 100.0
     p2.time = 101.5
 
-    tracker = process_packets([p1, p2])
+    tracker = FlowTracker()
+    session_id = "test-session"
+
+    process_packets(
+        [p1, p2],
+        tracker,
+        session_id
+    )
 
     flows = list(tracker.get_flows())
 

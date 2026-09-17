@@ -5,6 +5,7 @@ from src.database.database import (
     update_flow,
     save_packet
 )
+
 from src.database.queries import (
     get_packet_count,
     get_total_bytes,
@@ -18,6 +19,7 @@ from src.database.queries import (
     get_traffic,
     get_most_active_flows
 )
+
 from src.analyzer.flow import get_flow_key
 from src.analyzer.flow_tracker import FlowTracker
 from src.parser.packet import PacketInfo
@@ -41,6 +43,7 @@ def setup_test_data():
     clear_database()
 
     tracker = FlowTracker()
+    session_id = "test-session"
 
     packets = [
         PacketInfo(
@@ -92,7 +95,7 @@ def setup_test_data():
         tracker.process_packet(packet)
 
         flow = tracker.flows[key]
-        flow_id = create_flow_id(key)
+        flow_id = create_flow_id(key, session_id)
 
         if new_flow:
             save_flow(flow_id, flow)
@@ -108,13 +111,31 @@ def test_queries():
     assert get_packet_count() == 4
     assert get_total_bytes() == 1700
 
-    assert get_protocol_distribution() == [("TCP", 4)]
+    start_timestamp = 999.0
 
-    assert get_top_src_ips()[0] == ("192.168.1.10", 3)
-    assert get_top_dst_ips()[0] == ("8.8.8.8", 3)
+    assert get_protocol_distribution(start_timestamp) == [
+        ("TCP", 4)
+    ]
 
-    assert get_top_src_port()[0] == (5000, 3)
-    assert get_top_dst_port()[0] == (443, 4)
+    assert get_top_src_ips(start_timestamp)[0] == (
+        "192.168.1.10",
+        3
+    )
+
+    assert get_top_dst_ips(start_timestamp)[0] == (
+        "8.8.8.8",
+        3
+    )
+
+    assert get_top_src_port(start_timestamp)[0] == (
+        5000,
+        3
+    )
+
+    assert get_top_dst_port(start_timestamp)[0] == (
+        443,
+        4
+    )
 
     assert get_bandwidth() == [
         (1000, 500),
@@ -130,7 +151,7 @@ def test_queries():
         (1003, 1, 200)
     ]
 
-    most_active = get_most_active_flows()
+    most_active = get_most_active_flows(start_timestamp)
 
     assert most_active[0][1] == 3
     assert most_active[0][2] == 1000

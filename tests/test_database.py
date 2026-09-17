@@ -28,6 +28,7 @@ def test_persistence():
     clear_database()
 
     tracker = FlowTracker()
+    session_id = "test-session"
 
     packets = [
         PacketInfo(
@@ -79,7 +80,7 @@ def test_persistence():
         tracker.process_packet(packet)
 
         flow = tracker.flows[key]
-        flow_id = create_flow_id(key)
+        flow_id = create_flow_id(key, session_id)
 
         if new_flow:
             save_flow(flow_id, flow)
@@ -99,11 +100,14 @@ def test_persistence():
         "SELECT COUNT(*) FROM packets"
     ).fetchone()[0]
 
-    flow_a = create_flow_id((
-        ("192.168.1.10", 5000),
-        ("8.8.8.8", 443),
-        "TCP"
-    ))
+    flow_a = create_flow_id(
+        (
+            ("192.168.1.10", 5000),
+            ("8.8.8.8", 443),
+            "TCP"
+        ),
+        session_id
+    )
 
     flow_a_data = cursor.execute(
         """
